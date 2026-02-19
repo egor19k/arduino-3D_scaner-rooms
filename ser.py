@@ -1,10 +1,8 @@
-# convert_outside.py - исправленная версия
 import numpy as np
 import os
 
 print("=== Конвертер полярных координат в декартовы ===")
 
-# Читаем данные
 input_file = 'data.csv'
 output_file = 'output.xyz'
 
@@ -12,7 +10,6 @@ if not os.path.exists(input_file):
     print(f"Ошибка: Файл {input_file} не найден!")
     exit()
 
-# Парсим и конвертируем
 points = []
 error_count = 0
 
@@ -20,30 +17,24 @@ with open(input_file, 'r') as f:
     for line_num, line in enumerate(f, 1):
         line = line.strip()
         
-        # Пропускаем пустые строки
         if not line:
             continue
             
-        # Пропускаем строки с буквами (заголовки)
         if any(c.isalpha() for c in line):
             print(f"Пропущена строка {line_num}: содержит текст - '{line}'")
             continue
             
-        # Разделяем точкой с запятой
         if ';' in line:
             parts = line.split(';')
         else:
-            # Попробуем другими разделителями
             parts = line.replace(',', ';').split(';')
             
         if len(parts) >= 3:
             try:
-                # Очищаем от пробелов
                 phi_str = parts[0].strip()
                 theta_str = parts[1].strip()
                 r_str = parts[2].strip()
                 
-                # Проверяем что это числа
                 if not phi_str.replace('.', '').replace('-', '').isdigit():
                     print(f"Пропущена строка {line_num}: phi не число - '{phi_str}'")
                     continue
@@ -58,11 +49,9 @@ with open(input_file, 'r') as f:
                 theta = float(theta_str)
                 r = float(r_str)
                 
-                # Преобразуем градусы в радианы
                 phi_rad = phi * np.pi / 180.0
                 theta_rad = theta * np.pi / 180.0
                 
-                # Полярные -> декартовы
                 x = r * np.sin(theta_rad) * np.cos(phi_rad)
                 y = r * np.sin(theta_rad) * np.sin(phi_rad)
                 z = r * np.cos(theta_rad)
@@ -88,9 +77,6 @@ if len(points) == 0:
     print("Нет данных для сохранения!")
     exit()
 
-# Сохраняем в нескольких форматах
-
-# 1. Формат XYZ (простой)
 print("\n1. Сохраняю в формате XYZ...")
 with open('output.xyz', 'w') as f:
     f.write(f"{len(points)}\n")
@@ -99,7 +85,6 @@ with open('output.xyz', 'w') as f:
         f.write(f"C {x:.6f} {y:.6f} {z:.6f} {r:.6f}\n")
 print(f"✓ Создан файл: output.xyz")
 
-# 2. Формат CSV (для ParaView)
 print("2. Сохраняю в формате CSV...")
 with open('output.csv', 'w') as f:
     f.write("X,Y,Z,Radius,Phi,Theta\n")
@@ -107,7 +92,6 @@ with open('output.csv', 'w') as f:
         f.write(f"{x:.6f},{y:.6f},{z:.6f},{r:.6f},{phi:.6f},{theta:.6f}\n")
 print(f"✓ Создан файл: output.csv")
 
-# 3. Формат VTK (лучший для ParaView)
 print("3. Сохраняю в формате VTK...")
 with open('output.vtk', 'w') as f:
     f.write("# vtk DataFile Version 3.0\n")
@@ -135,14 +119,12 @@ with open('output.vtk', 'w') as f:
         f.write(f"{theta:.6f}\n")
 print(f"✓ Создан файл: output.vtk")
 
-# 4. Формат TXT (простейший)
 print("4. Сохраняю в простом формате...")
 with open('output.txt', 'w') as f:
     for x, y, z, r, phi, theta in points:
         f.write(f"{x} {y} {z} {r}\n")
 print(f"✓ Создан файл: output.txt")
 
-# Статистика
 print("\n=== СТАТИСТИКА ===")
 x_vals = [p[0] for p in points]
 y_vals = [p[1] for p in points]
@@ -177,3 +159,4 @@ print("  3. В 'Open Data With...' выберите XYZ Reader")
 print("  4. Нажмите Apply")
 
 print("\n✓ Конвертация завершена успешно!")
+
